@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.eussi</groupId>
-    <artifactId>nanomsg-demo</artifactId>
+    <artifactId>java4protocol</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
