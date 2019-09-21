@@ -8,11 +8,11 @@ import nanomsg.reqrep.ReqSocket;
  * Created by wangxueming on 2019/3/26.
  */
 public class ReqRep {
-    private static String url = "tcp://127.0.0.1:7789";
+    private static String url = "ipc://tmp/.proxy.ipc";
 
     public static void main(String[] args) {
-        node1();
         node0();
+        node1();
     }
     private static void node1() {
         final RepSocket socket = new RepSocket();
@@ -21,13 +21,16 @@ public class ReqRep {
             public void run() {
                 while (true) {
                     try {
-                        System.out.println( "node1:" + socket.recvString());  // 阻塞socket，直到超时或者有响应
+                        System.out.println("node1:" + socket.recvString());
+                        System.out.println(socket.getSndFd());
+                        System.out.println(socket.getRcvFd());
+                        System.out.println(socket.getNativeSocket());
                         Thread.sleep(1000);
                         socket.send("world");
 
-                    } catch (IOException e) {       // 忽略超时
+                    } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -36,19 +39,17 @@ public class ReqRep {
     }
 
     private static void node0() {
-        final ReqSocket socket = new ReqSocket();
-        socket.connect(url);
         new Thread(new Runnable() {
             public void run() {
                 while (true) {
+                    final ReqSocket socket = new ReqSocket();
+                    socket.connect(url);
                     try {
                         socket.send("hello");
                         Thread.sleep(1000);
                         System.out.println( "node0:" + socket.recvString());  // 阻塞socket，直到超时或者有响应
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
-                    } catch (IOException e) {
-                        // e.printStackTrace();
                     }
                 }
             }
